@@ -133,7 +133,7 @@
 
                 auto messageText = CCLabelBMFont::create("What do you want to delete?", "chatFont.fnt");
                 for (int i = 20; i < 26; i++) {
-                    auto letter = dynamic_cast<CCSprite*>(messageText->getChildren()->objectAtIndex(i));
+                    auto letter = static_cast<CCSprite*>(messageText->getChildren()->objectAtIndex(i));
                     letter->setColor(ccc3(255, 90, 90));
                 }
 
@@ -255,8 +255,8 @@
                 settingsSprite->setScale(0.75);
                 auto settingsMenu = CCMenu::create();
                 CCArray* children = CCDirector::sharedDirector()->getRunningScene()->getChildren();
-                auto popup = dynamic_cast<FLAlertLayer*>(children->lastObject())->m_mainLayer;
-                popup->getChildByID("main-menu")->addChild(settingsButton);
+                auto popup = static_cast<FLAlertLayer*>(children->lastObject());
+                popup->m_buttonMenu->addChild(settingsButton);
                 settingsButton->setPosition({-147, 81});
                 settingsButton->setZOrder(1);	
             }
@@ -265,9 +265,9 @@
         bool init(GJGameLevel* level, bool challenge) {
             if (!LevelInfoLayer::init(level, challenge)) return false;
 
-            songWidget = static_cast<CustomSongWidget*>(this->getChildByID("custom-songs-widget"));
-            downloadButton = songWidget->getChildByID("buttons-menu")->getChildByID("download-button");
-            cancelButton = songWidget->getChildByID("buttons-menu")->getChildByID("cancel-button");
+            songWidget = m_songWidget;
+            downloadButton = songWidget->m_downloadBtn;
+            cancelButton = songWidget->m_cancelDownloadBtn;
             globalLevel = this->m_level;
             globalLayer = this;
 
@@ -320,7 +320,7 @@
 
         virtual void downloadAssetFinished(int i, GJAssetType assetType) {
             CustomSongWidget::downloadAssetFinished(i, assetType);
-            if (static_cast<int>(assetType) == 2 && this == songWidget && trashButton && ((!downloadButton->isVisible() && !cancelButton->isVisible()) || std::string(this->m_errorLabel->getString()) == "Download complete.")) 
+            if (assetType == GJAssetType::SFX && this == songWidget && trashButton && ((!downloadButton->isVisible() && !cancelButton->isVisible()) || std::string(this->m_errorLabel->getString()) == "Download complete.")) 
                 trashButton->setVisible(true);
         }
 
